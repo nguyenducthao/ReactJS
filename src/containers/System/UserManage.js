@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import './UserManage.scss'
-import { getAllUser } from '../../services/userService'
+import { getAllUser, createNewUserApi } from '../../services/userService'
 import ModalUser from './ModalUser';
+import { emitter } from '../../utils/emitter';
 
 class UserManage extends Component {
 
@@ -16,6 +17,9 @@ class UserManage extends Component {
     }
 
     async componentDidMount() {
+        await this.getAllUser();
+    }
+    getAllUser = async () => {
         let response = await getAllUser('ALL');
         if (response && response.errCode === 0) {
             this.setState({
@@ -31,6 +35,18 @@ class UserManage extends Component {
     handleAddNewUser = () => {
         this.showHideModalUser();
     }
+    createNewUser = async (user) => {
+        let response = await createNewUserApi(user);
+        if (response && response.errCode !== 0) {
+            alert(response.errMessage);
+        } else {
+            await this.getAllUser();
+            this.setState({
+                isShowModalUser: false
+            })
+            emitter.emit('EVENT_CLEAR_MODAL_DATA');
+        }
+    }
     render() {
         let arrUsers = this.state.arrUsers;
         return (
@@ -38,6 +54,7 @@ class UserManage extends Component {
                 <ModalUser
                     isOpen={this.state.isShowModalUser}
                     showHideModalUser={this.showHideModalUser}
+                    createNewUser={this.createNewUser}
                 />
                 <div className='title'>Manage users</div>
                 <button
