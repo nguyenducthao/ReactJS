@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import './UserManage.scss'
-import { getAllUser, createNewUserApi, deleteUserApi } from '../../services/userService'
+import { getAllUser, createNewUserApi, deleteUserApi, editUserApi } from '../../services/userService'
 import ModalUser from './ModalUser';
 import { emitter } from '../../utils/emitter';
+import ModalEditUser from './ModalEditUser';
 
 class UserManage extends Component {
 
@@ -12,7 +13,9 @@ class UserManage extends Component {
         super(props);
         this.state = {
             arrUsers: [],
-            isShowModalUser: false
+            isShowModalUser: false,
+            isShowModaEditlUser: false,
+            currentUser: {}
         }
     }
 
@@ -33,7 +36,7 @@ class UserManage extends Component {
         })
     }
     handleAddNewUser = () => {
-        this.showHideModalUser();
+        this.showHideModaEditlUser();
     }
     createNewUser = async (user) => {
         let response = await createNewUserApi(user);
@@ -59,6 +62,30 @@ class UserManage extends Component {
             console.log(e)
         }
     }
+    showHideModaEditlUser = () => {
+        this.setState({
+            isShowModaEditlUser: !this.state.isShowModaEditlUser
+        })
+    }
+    handleEditUser = (user) => {
+        this.setState({
+            currentUser: user
+        })
+        this.showHideModaEditlUser();
+    }
+    editUser = async (user) => {
+        try {
+            let response = await editUserApi(user);
+            if (response && response.errCode === 0) {
+                this.showHideModaEditlUser();
+                this.getAllUser();
+            } else {
+                alert(response.message);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
     render() {
         let arrUsers = this.state.arrUsers;
         return (
@@ -68,6 +95,14 @@ class UserManage extends Component {
                     showHideModalUser={this.showHideModalUser}
                     createNewUser={this.createNewUser}
                 />
+                {this.state.isShowModaEditlUser &&
+                    <ModalEditUser
+                        isOpen={this.state.isShowModaEditlUser}
+                        showHideModaEditlUser={this.showHideModaEditlUser}
+                        editUser={this.editUser}
+                        currentUser={this.state.currentUser}
+                    />
+                }
                 <div className='title'>Manage users</div>
                 <button
                     className='btn btn-primary px-3'
@@ -91,7 +126,10 @@ class UserManage extends Component {
                                         <td>{item.lastName}</td>
                                         <td>{item.address}</td>
                                         <td>
-                                            <button className='btn-edit'><i className="fas fa-pencil-alt"></i></button>
+                                            <button
+                                                className='btn-edit'
+                                                onClick={() => this.handleEditUser(item)}
+                                            ><i className="fas fa-pencil-alt"></i></button>
                                             <button
                                                 className='btn-delete'
                                                 onClick={() => this.handleDeleteUser(item)}
