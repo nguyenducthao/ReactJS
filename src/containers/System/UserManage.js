@@ -36,7 +36,7 @@ class UserManage extends Component {
         })
     }
     handleAddNewUser = () => {
-        this.showHideModaEditlUser();
+        this.showHideModalUser();
     }
     createNewUser = async (user) => {
         let response = await createNewUserApi(user);
