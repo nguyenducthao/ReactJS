@@ -68,6 +68,16 @@ const adminReducer = (state = initialState, action) => {
             return {
                 ...state,
             }
+        case actionTypes.EDIT_USER_SUCCESS:
+            state.users = action.users;
+            return {
+                ...state,
+            }
+        case actionTypes.EDIT_USER_FAILED:
+            state.users = [];
+            return {
+                ...state,
+            }
         default:
             return state;
     }

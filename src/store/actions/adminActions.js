@@ -1,5 +1,5 @@
 import actionTypes from './actionTypes';
-import { getAllCodeApi, createNewUserApi, getAllUser, deleteUserApi } from '../../services/userService';
+import { getAllCodeApi, createNewUserApi, getAllUser, deleteUserApi, editUserApi } from '../../services/userService';
 import { toast } from "react-toastify";
 
 export const fetchGenderStart = () => {
@@ -134,4 +134,27 @@ export const deleteAUserSuccess = () => ({
 })
 export const deleteAUserFailed = () => ({
     type: actionTypes.DELETE_USER_FAILED
+})
+export const editAUser = (data) => {
+    return async (dispatch, getState) => {
+        try {
+            let res = await editUserApi(data);
+            if (res && res.errCode === 0) {
+                toast.success("Update a user succeed!");
+                dispatch(editAUserSuccess());
+            } else {
+                toast.error("Update a user error!");
+                dispatch(editAUserFailed());
+            }
+        } catch (e) {
+            toast.error("Update a user error!");
+            dispatch(editAUserFailed());
+        }
+    }
+}
+export const editAUserSuccess = () => ({
+    type: actionTypes.EDIT_USER_SUCCESS,
+})
+export const editAUserFailed = () => ({
+    type: actionTypes.EDIT_USER_FAILED
 })
